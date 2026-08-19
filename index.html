@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Paisa — your money, sorted</title>
+<meta name="theme-color" content="#6C4DF6" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Paisa" />
+<style>
+  :root{
+    --ground:#F4F2FA; --card:#fff; --ink:#1C1633; --muted:#7A7391; --hair:#E8E4F1;
+    --violet:#6C4DF6; --violetSoft:#EDE8FF; --mint:#12B981; --mintSoft:#DAF6EB;
+    --coral:#F2564B; --coralSoft:#FFE5E3; --sun:#FFC53D; --night:#191238;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+  input{font:inherit;width:100%}
+  .num{font-variant-numeric:tabular-nums}
+  .wrap{max-width:28rem;margin:0 auto;padding:0 1rem 7rem}
+  .card{background:var(--card);border:1px solid var(--hair);border-radius:1.5rem;box-shadow:0 2px 10px rgba(28,22,51,.05)}
+  .field{background:#F7F6FC;border:1px solid var(--hair);border-radius:1rem;padding:.7rem .9rem;color:var(--ink)}
+  .muted{color:var(--muted)}
+  .row{display:flex;align-items:center}
+  .between{justify-content:space-between}
+  .pill{border-radius:999px}
+  .eyebrow{font-size:.7rem;letter-spacing:.12em;color:var(--muted)}
+
+  /* login */
+  .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.25rem;
+    background:linear-gradient(160deg,#6C4DF6 0%,#3A2597 60%,#241663 100%);color:#fff}
+  .login h1{font-size:1.9rem;letter-spacing:-.03em;margin:.5rem 0}
+  .login input{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+    border-radius:1rem;padding:.9rem 1rem;color:#fff}
+  .login input::placeholder{color:#CFC4FF}
+  .login .go{width:100%;background:#fff;color:var(--violet);font-weight:700;border-radius:1rem;padding:.95rem;margin-top:.75rem}
+
+  /* header */
+  .head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:1.5rem 0 1rem}
+  .avatar{width:2.5rem;height:2.5rem;border-radius:999px;background:var(--violet);color:#fff;font-weight:700;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .navbtn{width:2.25rem;height:2.25rem;border-radius:999px;background:var(--card);border:1px solid var(--hair);
+    color:var(--muted);display:flex;align-items:center;justify-content:center}
+
+  /* hero */
+  .hero{border-radius:1.5rem;padding:1.5rem;color:#fff;margin-bottom:1rem;
+    background:linear-gradient(140deg,#6C4DF6 0%,#4A2FBE 55%,#2E1B7A 100%)}
+  .hero .big{font-size:2.9rem;font-weight:700;letter-spacing:-.03em;margin:.25rem 0 0}
+  .track{height:.5rem;border-radius:999px;background:rgba(255,255,255,.22);overflow:hidden;margin-top:1rem}
+  .track > div{height:100%;background:var(--sun);transition:width .4s ease}
+  .safe{background:rgba(255,255,255,.14);border-radius:1rem;padding:.75rem 1rem;margin-top:1rem}
+  .heroBtn{width:100%;background:#fff;color:var(--violet);font-weight:700;border-radius:1rem;padding:.85rem;margin-top:1rem}
+
+  .duo{display:flex;gap:.75rem;margin-bottom:1rem}
+  .duo > div{flex:1;padding:1rem}
+
+  .tabs{display:flex;padding:.25rem;border-radius:999px;background:#EAE6F5;margin-bottom:1rem}
+  .tabs button{flex:1;padding:.5rem;border-radius:999px;color:var(--muted);font-size:.875rem}
+  .tabs button[aria-selected="true"]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(28,22,51,.1)}
+
+  .seg{display:flex;padding:.25rem;border-radius:999px;background:#F3F1FA;margin-bottom:1rem}
+  .seg button{flex:1;padding:.5rem;border-radius:999px;color:var(--muted);font-size:.875rem}
+  .seg button.on-out{background:var(--coral);color:#fff;font-weight:600}
+  .seg button.on-in{background:var(--mint);color:#fff;font-weight:600}
+
+  .amt{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+  .amt span{font-size:1.5rem;color:var(--muted)}
+  .amt input{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.75rem 0 1rem}
+  .chip{padding:.4rem .75rem;border-radius:999px;font-size:.75rem;border:1px solid var(--hair)}
+  .chip.on{color:#fff;font-weight:600;border-color:transparent}
+  .submit{width:100%;padding:.9rem;border-radius:1rem;color:#fff;font-weight:600;font-size:.875rem}
+
+  .item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-top:1px solid var(--hair)}
+  .item:first-child{border-top:none}
+  .badge{width:2.5rem;height:2.5rem;border-radius:.9rem;display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 auto}
+  .grow{flex:1;min-width:0}
+  .trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .del{width:1.75rem;height:1.75rem;border-radius:999px;border:1px solid var(--hair);color:var(--muted);flex:0 0 auto}
+
+  .bar{height:.5rem;border-radius:999px;background:#F0EDF8;overflow:hidden}
+  .bar > div{height:100%;background:var(--violet)}
+
+  .total{border-radius:1.5rem;padding:1.5rem;background:var(--night);color:#fff}
+  .total .big{font-size:2.1rem;font-weight:700;color:var(--sun);margin:.25rem 0 0}
+
+  .sheetwrap{position:fixed;inset:0;background:rgba(25,18,56,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+  .sheet{width:100%;max-width:28rem;background:#fff;border-radius:1.5rem 1.5rem 0 0;padding:1.5rem;max-height:88vh;overflow-y:auto}
+  .srow{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--hair)}
+  .ghost{width:100%;padding:.9rem;border-radius:1rem;font-weight:600;font-size:.875rem;background:var(--violetSoft);color:var(--violet);margin-top:1.25rem}
+  .outline{width:100%;padding:.9rem;border-radius:1rem;font-weight:600;font-size:.875rem;border:1px solid var(--hair);color:var(--muted);margin-top:.5rem}
+
+  .toast{position:fixed;left:0;right:0;bottom:1.25rem;display:flex;justify-content:center;padding:0 1rem;z-index:60}
+  .toast > div{background:var(--night);color:#fff;border-radius:999px;padding:.65rem 1rem;font-size:.875rem;
+    display:flex;gap:.75rem;align-items:center;box-shadow:0 6px 20px rgba(28,22,51,.25)}
+  .toast button{color:var(--sun);font-weight:600}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ---------------- data ---------------- */
+var ACTIVE = "mt-active-user";
+var key = function(u){ return "mt-data-" + u.trim().toLowerCase().replace(/\s+/g,"-"); };
+
+var OUT_TAGS = ["🍔 Food","🏠 Rent","🚕 Travel","💡 Bills","🛍️ Shopping","💊 Health","🎬 Fun"];
+var IN_TAGS  = ["💰 Bonus","↩️ Refund","🎁 Gift","💻 Freelance","🏦 Interest"];
+
+var S = {
+  user: null,
+  data: { salary:0, opening:0, months:{} },
+  tab: "home", kind: "out", cursor: new Date(),
+  profile:false, editSalary:false, editOpening:false,
+  toast:null, undo:null, chip:null
+};
+
+function load(u){
+  try{
+    var raw = localStorage.getItem(key(u));
+    if(raw){
+      var p = JSON.parse(raw);
+      var months = {};
+      Object.keys(p.months||{}).forEach(function(k){
+        months[k] = { expenses:(p.months[k].expenses)||[], credits:(p.months[k].credits)||[] };
+      });
+      return { salary:p.salary||0, opening:p.opening||0, months:months };
+    }
+  }catch(e){}
+  return { salary:0, opening:0, months:{} };
+}
+function save(){
+  try{ localStorage.setItem(key(S.user), JSON.stringify(S.data)); }
+  catch(e){ toast("Couldn't save — storage is full or blocked"); }
+}
+
+/* ---------------- helpers ---------------- */
+function inr(n){
+  return "₹" + new Intl.NumberFormat("en-IN",{maximumFractionDigits:0}).format(Math.round(Math.abs(n)||0));
+}
+function mKey(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0"); }
+function mLabel(d){ return d.toLocaleString("en-IN",{month:"long",year:"numeric"}); }
+function dLabel(iso){
+  if(!iso) return "";
+  var d = new Date(iso);
+  return isNaN(d) ? "" : d.toLocaleString("en-IN",{day:"numeric",month:"short"});
+}
+function sum(a){ return (a||[]).reduce(function(s,e){ return s + e.amount; },0); }
+function monthOf(m){ return { expenses:(m&&m.expenses)||[], credits:(m&&m.credits)||[] }; }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function vibe(pct, over, has){
+  if(!has) return "Add your salary and we're off";
+  if(over) return "Overspent — reset and go again 💪";
+  if(pct>=60) return "Comfortable. You've got room 🌿";
+  if(pct>=30) return "Steady — worth keeping an eye on 👀";
+  if(pct>=10) return "Getting tight. Go slow 🐢";
+  return "Nearly out — essentials only 🚨";
+}
+var toastTimer;
+function toast(text, undoFn){
+  S.toast = text; S.undo = undoFn || null;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ S.toast=null; S.undo=null; render(); }, undoFn ? 5000 : 1800);
+}
+
+/* ---------------- derived ---------------- */
+function view(){
+  var k = mKey(S.cursor);
+  var m = monthOf(S.data.months[k]);
+  var pd = new Date(S.cursor); pd.setMonth(pd.getMonth()-1);
+  var prev = monthOf(S.data.months[mKey(pd)]);
+
+  var spent = sum(m.expenses), credited = sum(m.credits);
+  var moneyIn = S.data.salary + credited, left = moneyIn - spent;
+  var pct = moneyIn > 0 ? Math.max(0, Math.min(100, left/moneyIn*100)) : 0;
+
+  var now = new Date(), thisMonth = mKey(now) === k;
+  var daysLeft = thisMonth ? new Date(now.getFullYear(), now.getMonth()+1, 0).getDate() - now.getDate() + 1 : 0;
+  var perDay = (thisMonth && daysLeft>0 && left>0) ? left/daysLeft : 0;
+
+  var prevSpent = sum(prev.expenses);
+  var diff = prevSpent>0 ? (spent-prevSpent)/prevSpent*100 : null;
+
+  var logged = Object.keys(S.data.months).map(function(kk){ return monthOf(S.data.months[kk]); })
+    .filter(function(x){ return x.expenses.length || x.credits.length; });
+  var total = S.data.opening + logged.reduce(function(s,x){
+    return s + (S.data.salary + sum(x.credits) - sum(x.expenses));
+  },0);
+
+  var entries = m.expenses.map(function(e){ return Object.assign({},e,{type:"out"}); })
+    .concat(m.credits.map(function(e){ return Object.assign({},e,{type:"in"}); }))
+    .sort(function(a,b){ return String(b.id).localeCompare(String(a.id)); });
+
+  var map = {};
+  m.expenses.forEach(function(e){ map[e.label] = (map[e.label]||0) + e.amount; });
+  var breakdown = Object.keys(map).map(function(l){ return {label:l,total:map[l]}; })
+    .sort(function(a,b){ return b.total-a.total; }).slice(0,6);
+
+  var days = {}; entries.forEach(function(e){ if(e.date) days[String(e.date).slice(0,10)] = 1; });
+  var streak = 0, d = new Date();
+  for(var i=0;i<60;i++){
+    var s = d.toISOString().slice(0,10);
+    if(days[s]) streak++; else if(i>0) break;
+    d.setDate(d.getDate()-1);
+  }
+
+  return {k:k,m:m,spent:spent,credited:credited,moneyIn:moneyIn,left:left,pct:pct,over:left<0,
+    daysLeft:daysLeft,perDay:perDay,diff:diff,total:total,entries:entries,breakdown:breakdown,
+    streak:streak,logged:logged.length};
+}
+
+/* ---------------- render ---------------- */
+function render(){
+  var app = document.getElementById("app");
+  if(!S.user){ app.innerHTML = loginHTML(); wire(); return; }
+  var v = view();
+  app.innerHTML = appHTML(v) + (S.profile ? sheetHTML(v) : "") + toastHTML();
+  wire();
+}
+
+function loginHTML(){
+  return '<div class="login"><div style="width:100%;max-width:22rem">'
+    + '<div style="font-size:3rem">🪙</div>'
+    + '<h1>Your money, sorted</h1>'
+    + '<p style="color:#CFC4FF;font-size:.875rem;margin:0 0 1.5rem">Pick a username. No password, no email — it just keeps your entries yours.</p>'
+    + '<input id="name" placeholder="username" aria-label="Username" autocomplete="off" />'
+    + '<button class="go" data-a="login">Let\'s go</button>'
+    + '<p style="color:#B7A9F0;font-size:.75rem;text-align:center;margin-top:1rem">Same name next time brings your data back.</p>'
+    + '</div></div>';
+}
+
+function appHTML(v){
+  var tags = S.kind === "out" ? OUT_TAGS : IN_TAGS;
+  var accent = S.kind === "out" ? "var(--coral)" : "var(--mint)";
+  var h = new Date().getHours();
+  var greet = h<12 ? "MORNING" : h<17 ? "AFTERNOON" : "EVENING";
+
+  var s = '<div class="wrap">';
+
+  s += '<div class="head"><div style="min-width:0">'
+    + '<p class="eyebrow" style="margin:0">'+greet+'</p>'
+    + '<h1 class="trunc" style="font-size:1.25rem;margin:.15rem 0 0">'+esc(S.user)+'</h1></div>'
+    + '<div class="row" style="gap:.5rem">'
+    + (v.streak>1 ? '<span class="pill" style="background:var(--violetSoft);color:var(--violet);font-size:.75rem;font-weight:600;padding:.35rem .75rem">🔥 '+v.streak+'</span>' : '')
+    + '<button class="avatar" data-a="profile" aria-label="Your profile">'+esc(S.user.slice(0,1).toUpperCase())+'</button>'
+    + '</div></div>';
+
+  s += '<div class="row between" style="margin-bottom:1rem">'
+    + '<button class="navbtn" data-a="prev" aria-label="Previous month">‹</button>'
+    + '<p style="font-size:.875rem;font-weight:600;margin:0">'+mLabel(S.cursor)+'</p>'
+    + '<button class="navbtn" data-a="next" aria-label="Next month">›</button></div>';
+
+  var fill = v.moneyIn>0 ? Math.min(100, v.spent/v.moneyIn*100) : (v.spent>0?100:0);
+  s += '<div class="hero">'
+    + '<p class="eyebrow" style="color:#C9BCFF;margin:0">'+(v.over?"OVER BY":"LEFT THIS MONTH")+'</p>'
+    + '<p class="big num">'+inr(v.left)+'</p>'
+    + '<div class="track"><div style="width:'+fill+'%;background:'+(v.over?"var(--coral)":"var(--sun)")+'"></div></div>'
+    + '<p style="color:#E4DDFF;font-size:.875rem;margin:.75rem 0 0">'+vibe(v.pct,v.over,v.moneyIn>0)+'</p>'
+    + (v.perDay>0 ? '<div class="safe"><p style="color:#C9BCFF;font-size:.75rem;margin:0">Safe to spend daily</p>'
+        + '<p class="num" style="font-size:1.25rem;font-weight:700;margin:.15rem 0 0">'+inr(v.perDay)
+        + ' <span style="font-size:.75rem;font-weight:400;color:#C9BCFF">for '+v.daysLeft+' more '+(v.daysLeft===1?"day":"days")+'</span></p></div>' : '')
+    + (S.data.salary===0 ? '<button class="heroBtn" data-a="salary-start">Add your salary</button>' : '')
+    + '</div>';
+
+  s += '<div class="duo">'
+    + '<div class="card"><p style="color:var(--mint);font-size:.75rem;font-weight:600;margin:0">↓ In</p>'
+    + '<p class="num" style="font-size:1.15rem;font-weight:700;margin:.25rem 0 0">'+inr(v.moneyIn)+'</p>'
+    + '<p class="muted" style="font-size:.75rem;margin:.15rem 0 0">salary + '+inr(v.credited)+' extra</p></div>'
+    + '<div class="card"><p style="color:var(--coral);font-size:.75rem;font-weight:600;margin:0">↑ Out</p>'
+    + '<p class="num" style="font-size:1.15rem;font-weight:700;margin:.25rem 0 0">'+inr(v.spent)+'</p>'
+    + '<p class="muted" style="font-size:.75rem;margin:.15rem 0 0">'
+    + (v.diff===null ? "no last month data" : (v.diff>=0?"▲ ":"▼ ")+Math.abs(Math.round(v.diff))+"% vs last month")
+    + '</p></div></div>';
+
+  s += '<div class="tabs" role="tablist">'
+    + tab("home","Add") + tab("list","History") + tab("stats","Where it went")
+    + '</div>';
+
+  if(S.tab === "home"){
+    s += '<div class="card" style="padding:1rem;margin-bottom:1rem">'
+      + '<div class="seg">'
+      + '<button data-a="kind-out" class="'+(S.kind==="out"?"on-out":"")+'">I spent</button>'
+      + '<button data-a="kind-in" class="'+(S.kind==="in"?"on-in":"")+'">I got paid</button></div>'
+      + '<div class="amt"><span class="num">₹</span>'
+      + '<input id="amt" class="field" type="number" inputmode="numeric" placeholder="0" aria-label="Amount" /></div>'
+      + '<input id="note" class="field" placeholder="'+(S.kind==="out"?"What was it for?":"Where\'s it from?")+'" aria-label="Reason" />'
+      + '<div class="chips">'
+      + tags.map(function(t){
+          var on = S.chip===t;
+          return '<button class="chip'+(on?" on":"")+'" data-tag="'+esc(t)+'"'+(on?' style="background:'+accent+'"':'')+'>'+esc(t)+'</button>';
+        }).join("")
+      + '</div>'
+      + '<button class="submit" data-a="add" style="background:'+accent+'">'+(S.kind==="out"?"Add expense":"Add credit")+'</button>'
+      + '</div>';
+  }
+
+  if(S.tab === "list"){
+    s += '<div class="card" style="overflow:hidden;margin-bottom:1rem">';
+    if(!v.entries.length){
+      s += '<p class="muted" style="padding:2rem;text-align:center;font-size:.875rem;margin:0">Nothing here yet for '+mLabel(S.cursor)+'.</p>';
+    } else {
+      s += v.entries.map(function(e){
+        var out = e.type==="out";
+        return '<div class="item">'
+          + '<div class="badge" style="background:'+(out?"var(--coralSoft)":"var(--mintSoft)")+';color:'+(out?"var(--coral)":"var(--mint)")+'">'+(out?"−":"+")+'</div>'
+          + '<div class="grow"><p class="trunc" style="font-size:.875rem;font-weight:600;margin:0">'+esc(e.label)+'</p>'
+          + (dLabel(e.date)?'<p class="muted" style="font-size:.75rem;margin:.1rem 0 0">'+dLabel(e.date)+'</p>':'')+'</div>'
+          + '<span class="num" style="font-size:.875rem;font-weight:700;color:'+(out?"var(--coral)":"var(--mint)")+'">'+(out?"−":"+")+inr(e.amount)+'</span>'
+          + '<button class="del" data-del="'+e.type+':'+e.id+'" aria-label="Delete '+esc(e.label)+'">×</button></div>';
+      }).join("");
+    }
+    s += '</div>';
+  }
+
+  if(S.tab === "stats"){
+    s += '<div class="card" style="padding:1.25rem;margin-bottom:1rem">';
+    if(!v.breakdown.length){
+      s += '<p class="muted" style="text-align:center;font-size:.875rem;margin:1rem 0">Add a few expenses and your spending map shows up here.</p>';
+    } else {
+      s += v.breakdown.map(function(b){
+        var p = Math.round(b.total/v.spent*100);
+        return '<div style="margin-bottom:1rem"><div class="row between" style="font-size:.875rem;margin-bottom:.4rem">'
+          + '<span style="font-weight:600">'+esc(b.label)+'</span>'
+          + '<span class="num muted">'+inr(b.total)+' · '+p+'%</span></div>'
+          + '<div class="bar"><div style="width:'+p+'%"></div></div></div>';
+      }).join("");
+    }
+    s += '<button class="ghost" data-a="copy" style="margin-top:.5rem">Copy this month\'s summary</button></div>';
+  }
+
+  s += '<div class="total"><p class="eyebrow" style="color:#A79BD6;margin:0">TOTAL MONEY YOU HAVE</p>'
+    + '<p class="big num">'+(v.total<0?"−":"")+inr(v.total)+'</p>'
+    + '<p style="color:#A79BD6;font-size:.75rem;margin:.5rem 0 0">What you started with, plus what\'s left from each of the '+v.logged+' '+(v.logged===1?"month":"months")+' you\'ve logged.</p>'
+    + '</div>';
+
+  s += '<p class="muted" style="text-align:center;font-size:.75rem;margin-top:1.25rem">Saved on this device, under “'+esc(S.user)+'”.</p>';
+  return s + '</div>';
+}
+
+function tab(id,text){
+  return '<button role="tab" aria-selected="'+(S.tab===id)+'" data-tab="'+id+'">'+text+'</button>';
+}
+
+function sheetHTML(v){
+  var salaryCell = S.editSalary
+    ? '<input id="sal" class="field num" type="number" inputmode="numeric" value="'+(S.data.salary||"")+'" placeholder="0" aria-label="Salary" style="width:8rem;text-align:right;font-weight:700" />'
+    : '<span class="num" style="font-weight:700">'+inr(S.data.salary)+'</span>';
+  var openCell = S.editOpening
+    ? '<input id="open" class="field num" type="number" inputmode="numeric" value="'+(S.data.opening||"")+'" placeholder="0" aria-label="Starting savings" style="width:8rem;text-align:right;font-weight:700" />'
+    : '<span class="num" style="font-weight:700;color:var(--muted)">'+inr(S.data.opening)+'</span>';
+
+  var rows = [
+    ["Left from "+mLabel(S.cursor), (v.over?"−":"")+inr(v.left), v.over?"var(--coral)":"var(--mint)"],
+    ["Spent this month", inr(v.spent), "var(--coral)"],
+    ["Extra credited this month", inr(v.credited), "var(--mint)"]
+  ].map(function(r){
+    return '<div class="srow"><span class="muted" style="font-size:.875rem">'+r[0]+'</span>'
+      + '<span class="num" style="font-weight:700;color:'+r[2]+'">'+r[1]+'</span></div>';
+  }).join("");
+
+  return '<div class="sheetwrap" data-a="close-bg" role="dialog" aria-label="Your profile"><div class="sheet" id="sheet">'
+    + '<div class="row between" style="margin-bottom:1.25rem"><div class="row" style="gap:.75rem;min-width:0">'
+    + '<div class="avatar" style="width:3rem;height:3rem;font-size:1.25rem">'+esc(S.user.slice(0,1).toUpperCase())+'</div>'
+    + '<div style="min-width:0"><p class="trunc" style="font-size:1.1rem;font-weight:700;margin:0">'+esc(S.user)+'</p>'
+    + '<p class="muted" style="font-size:.75rem;margin:.1rem 0 0">'+v.logged+' '+(v.logged===1?"month":"months")+' logged</p></div></div>'
+    + '<button class="del" data-a="close" aria-label="Close">×</button></div>'
+    + '<div style="background:var(--night);color:#fff;border-radius:1rem;padding:1rem;margin-bottom:.75rem">'
+    + '<p class="eyebrow" style="color:#A79BD6;margin:0">TOTAL MONEY YOU HAVE</p>'
+    + '<p class="num" style="font-size:1.9rem;font-weight:700;color:var(--sun);margin:.25rem 0 0">'+(v.total<0?"−":"")+inr(v.total)+'</p></div>'
+    + '<div class="srow"><span class="muted" style="font-size:.875rem">Monthly salary</span>'+salaryCell+'</div>'
+    + rows
+    + '<div class="srow"><span class="muted" style="font-size:.875rem">Started with</span>'+openCell+'</div>'
+    + '<button class="ghost" data-a="'+(S.editSalary?"save-salary":"edit-salary")+'"'
+    + (S.editSalary?' style="background:var(--mint);color:#fff;margin-top:1.25rem"':'')+'>'
+    + (S.editSalary?"Save salary":"Update salary")+'</button>'
+    + '<button class="outline" data-a="'+(S.editOpening?"save-opening":"edit-opening")+'">'
+    + (S.editOpening?"Save starting savings":"Edit starting savings")+'</button>'
+    + '<button class="outline" data-a="signout">Sign out</button>'
+    + '</div></div>';
+}
+
+function toastHTML(){
+  if(!S.toast) return "";
+  return '<div class="toast"><div><span>'+esc(S.toast)+'</span>'
+    + (S.undo ? '<button data-a="undo">Undo</button>' : '') + '</div></div>';
+}
+
+/* ---------------- actions ---------------- */
+function writeMonth(patch){
+  var k = mKey(S.cursor);
+  var m = monthOf(S.data.months[k]);
+  S.data.months[k] = Object.assign({}, m, patch);
+  save();
+}
+
+function add(){
+  var amtEl = document.getElementById("amt");
+  var noteEl = document.getElementById("note");
+  var val = Number(amtEl && amtEl.value);
+  if(!isFinite(val) || val <= 0){ toast("Pop in an amount first"); render(); return; }
+  var label = ((noteEl && noteEl.value) || "").trim() || (S.kind==="out" ? "Misc" : "Credit");
+  var entry = { id:String(Date.now()), label:label, amount:val, date:new Date().toISOString() };
+  var m = monthOf(S.data.months[mKey(S.cursor)]);
+  if(S.kind==="out") writeMonth({ expenses: m.expenses.concat([entry]) });
+  else writeMonth({ credits: m.credits.concat([entry]) });
+  S.chip = null;
+  toast(S.kind==="out" ? inr(val)+" out" : inr(val)+" in");
+  render();
+}
+
+function del(type,id){
+  var k = mKey(S.cursor);
+  var before = JSON.parse(JSON.stringify(monthOf(S.data.months[k])));
+  var m = monthOf(S.data.months[k]);
+  if(type==="out") writeMonth({ expenses: m.expenses.filter(function(e){ return e.id!==id; }) });
+  else writeMonth({ credits: m.credits.filter(function(e){ return e.id!==id; }) });
+  toast("Deleted", function(){ S.data.months[k] = before; save(); S.toast=null; S.undo=null; render(); });
+  render();
+}
+
+function copySummary(){
+  var v = view();
+  var text = [mLabel(S.cursor), "Money in: "+inr(v.moneyIn), "Money out: "+inr(v.spent),
+    (v.over?"Over by: ":"Left: ")+inr(v.left), "Total held: "+inr(v.total)].join("\n");
+  var done = function(){ toast("Summary copied"); render(); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, function(){ toast("Copy didn't work here"); render(); });
+  } else { toast("Copy didn't work here"); render(); }
+}
+
+function wire(){
+  var app = document.getElementById("app");
+
+  app.onclick = function(ev){
+    var t = ev.target.closest("[data-a],[data-tab],[data-tag],[data-del]");
+    if(!t) return;
+
+    if(t.dataset.tab){ S.tab = t.dataset.tab; return render(); }
+
+    if(t.dataset.tag){
+      var noteEl = document.getElementById("note");
+      if(noteEl) noteEl.value = t.dataset.tag;
+      S.chip = S.chip === t.dataset.tag ? null : t.dataset.tag;
+      return render0(t.dataset.tag);
+    }
+
+    if(t.dataset.del){
+      var parts = t.dataset.del.split(":");
+      return del(parts[0], parts[1]);
+    }
+
+    var a = t.dataset.a;
+    if(a === "login"){
+      var n = (document.getElementById("name").value || "").trim();
+      if(!n) return;
+      S.user = n; S.data = load(n);
+      try{ localStorage.setItem(ACTIVE, n); }catch(e){}
+      return render();
+    }
+    if(a === "signout"){
+      try{ localStorage.removeItem(ACTIVE); }catch(e){}
+      S.user = null; S.profile = false; S.editSalary = false; S.editOpening = false;
+      S.data = { salary:0, opening:0, months:{} };
+      return render();
+    }
+    if(a === "prev"){ S.cursor.setMonth(S.cursor.getMonth()-1); return render(); }
+    if(a === "next"){ S.cursor.setMonth(S.cursor.getMonth()+1); return render(); }
+    if(a === "kind-out"){ S.kind = "out"; S.chip = null; return render(); }
+    if(a === "kind-in"){ S.kind = "in"; S.chip = null; return render(); }
+    if(a === "add") return add();
+    if(a === "copy") return copySummary();
+    if(a === "profile"){ S.profile = true; return render(); }
+    if(a === "close"){ S.profile = false; S.editSalary = false; S.editOpening = false; return render(); }
+    if(a === "close-bg"){
+      if(ev.target.id !== "sheet" && !ev.target.closest("#sheet")){
+        S.profile = false; S.editSalary = false; S.editOpening = false; return render();
+      }
+      return;
+    }
+    if(a === "salary-start"){ S.profile = true; S.editSalary = true; return render(); }
+    if(a === "edit-salary"){ S.editSalary = true; return render(); }
+    if(a === "save-salary"){
+      var sv = Number(document.getElementById("sal").value);
+      S.data.salary = isFinite(sv) && sv > 0 ? sv : 0; save();
+      S.editSalary = false; toast("Salary updated"); return render();
+    }
+    if(a === "edit-opening"){ S.editOpening = true; return render(); }
+    if(a === "save-opening"){
+      var ov = Number(document.getElementById("open").value);
+      S.data.opening = isFinite(ov) ? ov : 0; save();
+      S.editOpening = false; return render();
+    }
+    if(a === "undo" && S.undo) return S.undo();
+  };
+
+  app.onkeydown = function(ev){
+    if(ev.key !== "Enter") return;
+    var id = ev.target.id;
+    if(id === "name"){ ev.target.blur(); app.querySelector('[data-a="login"]').click(); }
+    if(id === "amt" || id === "note") add();
+    if(id === "sal") app.querySelector('[data-a="save-salary"]').click();
+    if(id === "open") app.querySelector('[data-a="save-opening"]').click();
+  };
+}
+
+/* highlight a chip without wiping what's typed */
+function render0(tag){
+  var chips = document.querySelectorAll(".chip");
+  var accent = S.kind === "out" ? "var(--coral)" : "var(--mint)";
+  chips.forEach(function(c){
+    var on = S.chip === c.dataset.tag;
+    c.classList.toggle("on", on);
+    c.style.background = on ? accent : "";
+  });
+}
+
+/* ---------------- boot ---------------- */
+(function(){
+  try{
+    var u = localStorage.getItem(ACTIVE);
+    if(u){ S.user = u; S.data = load(u); }
+  }catch(e){}
+  render();
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  }
+})();
+</script>
+</body>
+</html>
