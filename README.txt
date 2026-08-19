@@ -1,4 +1,4 @@
-PAISA — money tracker (standalone app)
+KOSHA — money tracker (standalone app)
 ======================================
 
 FILES (keep all five together in one folder)
@@ -12,7 +12,7 @@ PUT IT ONLINE (free, ~2 minutes)
   Option A — Netlify Drop
     1. Go to app.netlify.com/drop
     2. Drag this whole folder onto the page
-    3. You get a link like https://paisa-xyz.netlify.app — share that
+    3. You get a link like https://koshaa.shop — share that
 
   Option B — GitHub Pages
     1. Create a public repo, upload all five files to the root

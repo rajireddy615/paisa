@@ -1,6 +1,6 @@
 {
-  "name": "Paisa — your money, sorted",
-  "short_name": "Paisa",
+  "name": "Kosha — your money, sorted",
+  "short_name": "Kosha",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
